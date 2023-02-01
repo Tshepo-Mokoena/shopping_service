@@ -9,14 +9,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.shopping_service.json.request.CreateUser;
 import com.shopping_service.json.response.Response;
-import com.shopping_service.service.registration.IRegistrationService;
+import com.shopping_service.service.registration.user.IUserRegistrationService;
 
 @RestController
-@RequestMapping("/api/registration")
+@RequestMapping("/api/registration/user")
 public class UserRegistrationAPI {
 
 	@Autowired
-	private IRegistrationService registrationService;
+	private IUserRegistrationService registrationService;	
 
 	@PostMapping
 	public Response<?> register(@RequestBody CreateUser user) {

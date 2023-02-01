@@ -1,4 +1,4 @@
-package com.shopping_service.service;
+package com.shopping_service.service.user;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,7 +45,7 @@ public class UserService implements IUserService{
 	}
 
 	@Override
-	public void deleteUser(User user) {
+	public void delete(User user) {
 		userRepo.delete(user);
 	}
 

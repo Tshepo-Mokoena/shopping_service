@@ -35,6 +35,10 @@ public class Response<T> {
 	private String message;
 	
 	@Nullable
+	@JsonProperty("description")
+	private String desc;
+	
+	@Nullable
 	@JsonProperty("data")
 	private T data;
 	
