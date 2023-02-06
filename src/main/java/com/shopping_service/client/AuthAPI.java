@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,7 +37,7 @@ public class AuthAPI {
 				.data(authService.forgotPassword(email)).build();
 	}
 	
-	@PostMapping
+	@PutMapping
 	public Response<?> changePassword(@RequestParam("token") String token,
 			@RequestBody PasswordRequest passwordRequest) {
 		return Response.builder().status(HttpStatus.OK).message("success")

@@ -1,6 +1,7 @@
 package com.shopping_service.service.authentication;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,11 +13,13 @@ import com.shopping_service.client.exception.ConflictException;
 import com.shopping_service.client.exception.NotFoundException;
 import com.shopping_service.json.request.AuthRequest;
 import com.shopping_service.json.request.PasswordRequest;
+import com.shopping_service.persistence.loginhistory.LoginHistory;
 import com.shopping_service.persistence.tokens.passwordreset.PasswordResetToken;
 import com.shopping_service.persistence.user.User;
 import com.shopping_service.security.UserPrincipal;
 import com.shopping_service.security.jwt.IJwtProvider;
 import com.shopping_service.security.util.SecurityUtil;
+import com.shopping_service.service.loginhistory.ILoginHistoryService;
 import com.shopping_service.service.token.passwordresettoken.IPasswordResetTokenService;
 import com.shopping_service.service.user.IUserService;
 import com.shopping_service.util.Util;
@@ -33,6 +36,8 @@ public class AuthenticationService implements IAuthenticationService {
 	@Autowired
 	private IPasswordResetTokenService passwordResetTokenService;
 	
+	@Autowired
+	private ILoginHistoryService loginHistoryService;
 
 	@Autowired
 	private IUserService userService;
@@ -46,13 +51,26 @@ public class AuthenticationService implements IAuthenticationService {
 		
 		UserPrincipal accountPrincipal = (UserPrincipal) authentication.getPrincipal();
 		
-		String jwtToken = jwtProvider.generateJwtToken(accountPrincipal);	
+		String jwtToken = jwtProvider.generateJwtToken(accountPrincipal);
+				
+		User signedInUser = accountPrincipal.getUser();
 		
-		User signedInAccount = accountPrincipal.getUser();
+		loginHistoryService.save(LoginHistory.builder()
+				.user(signedInUser)
+				.desc("success")
+				.build());
 		
-		signedInAccount.setToken(jwtToken);
+		signedInUser.setLastLogin(new Date());
 		
-		return signedInAccount;
+		signedInUser.setLoginsCount(signedInUser.getLoginsCount() + 1);
+		
+		signedInUser.setUpdatedAt(LocalDateTime.now());
+		
+		userService.save(signedInUser);
+		
+		signedInUser.setToken(jwtToken);
+		
+		return signedInUser;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.shopping_service.persistence.tokens.passwordreset;
+package com.shopping_service.persistence.token.userconfirmationtoken;
 
 import java.time.LocalDateTime;
 
@@ -12,36 +12,34 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
-@SuperBuilder
 @Entity
-@Getter
-@Setter
-@Table(name = "password_reset_token")
-public class PasswordResetToken {
+@Data
+@SuperBuilder
+@Table(name = "user_confirmation_token")
+public class UserConfirmationToken {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "_id", updatable = false, nullable = false, unique = true)
+	@Column(name = "_id", updatable = true, nullable = true, unique = true)
 	private Long id;
 	
-	@Column(name = "token", updatable = false, nullable = false, unique = true)
+	@Column(name = "token", updatable = false, nullable = false)
 	private String token;
 	
 	@Column(name = "created_at", updatable = false, nullable = false)
 	private LocalDateTime createdAt;
 	
+	@Column(name = "confirmed_at", updatable = false, nullable = false)
+	private LocalDateTime confirmedAt;
+	
 	@Column(name = "expires_at", updatable = false, nullable = false)
 	private LocalDateTime expiresAt;
 	
-	@Column(name = "reseted_at", updatable = false, nullable = true)
-	private LocalDateTime resetedAt;
-	
 	@ManyToOne
-	@JoinColumn(name = "user",nullable = false, updatable = false)
+	@JoinColumn(name = "user_id", nullable = false, updatable = false)
 	private User user;
 
 }

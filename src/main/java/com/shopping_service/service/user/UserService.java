@@ -49,4 +49,9 @@ public class UserService implements IUserService{
 		userRepo.delete(user);
 	}
 
+	@Override
+	public void enable(String email, boolean active) {
+		userRepo.enable(email, active);
+	}
+
 }

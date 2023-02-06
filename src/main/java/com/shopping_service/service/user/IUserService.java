@@ -59,4 +59,10 @@ public interface IUserService {
 	 */
 	void delete(User user);
 
+	/** 
+	 * @param email
+	 * @param active
+	 */
+	void enable(String email, boolean active);
+
 }

@@ -25,7 +25,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException{
-		return request.getRequestURI().startsWith("/api/auth/admin");
+		return request.getRequestURI().startsWith("/api/system");
 	}
 
 	@Override

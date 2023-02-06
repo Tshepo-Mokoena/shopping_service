@@ -2,6 +2,7 @@ package com.shopping_service.json.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shopping_service.persistence.user.User;
+import com.shopping_service.security.authority.Role;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,19 +25,24 @@ public class AuthResponse {
 	@JsonProperty("email")
 	private String email;
 	
+	@JsonProperty("role")
+	private Role role;
+	
 	@JsonProperty("token")
 	private String token;
 	
 	private transient User user;
 
-	public String getFirstName() { return firstName = this.getUser().getFirstName(); }
+	public String getFirstName() { return this.firstName = this.getUser().getFirstName(); }
 
-	public String getLastName() { return lastName = this.getUser().getLastName(); }
+	public String getLastName() { return this.lastName = this.getUser().getLastName(); }
 
-	public String getPhone() { return phone = this.getUser().getPhone(); }
+	public String getPhone() { return this.phone = this.getUser().getPhone(); }
 
-	public String getEmail() { return email = this.getUser().getEmail(); }
+	public String getEmail() { return this.email = this.getUser().getEmail(); }
+	
+	public Role getRole() { return this.role = this.getUser().getRole(); }
 
-	public String getToken() { return token = this.getUser().getToken(); }	
+	public String getToken() { return this.token = this.getUser().getToken(); }	
 
 }
