@@ -5,82 +5,104 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.shopping_service.client.exception.ConflictException;
 import com.shopping_service.client.exception.NotFoundException;
 import com.shopping_service.json.request.CreateUser;
-import com.shopping_service.persistence.cart.Cart;
 import com.shopping_service.persistence.token.userconfirmationtoken.UserConfirmationToken;
 import com.shopping_service.persistence.user.User;
-import com.shopping_service.security.authority.Role;
-import com.shopping_service.security.util.SecurityUtil;
-import com.shopping_service.service.cart.ICartService;
+import com.shopping_service.service.token.userconfirmationtoken.IUserConfirmationTokenService;
 import com.shopping_service.service.user.IUserService;
-import com.shopping_service.service.userconfirmationtoken.IUserConfirmationTokenService;
+import com.shopping_service.util.Util;
 
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
-@Slf4j
-public class UserRegistrationService implements IUserRegistrationService{
+public class UserRegistrationService implements IUserRegistrationService {
 	
 	@Autowired
 	private IUserService userService;
 	
 	@Autowired
-	private ICartService cartService;
-	
-	@Autowired
-	private IUserConfirmationTokenService userConfirmationTokenService;
-		
+	private IUserConfirmationTokenService userConfirmService;
+
 	@Override
-	@Transactional
 	public CreateUser register(@Valid CreateUser user) {
 		
-		if ( !userService.findByEmail(user.getEmail()).isEmpty() )
-			throw new ConflictException( "email_exists: ".concat(user.getEmail()) );
-		
-		User builtUser = User.builder()
-				.firstName(user.getEmail())
+		User newUser = User.builder()
+				.firstName(user.getFirstName())
 				.lastName(user.getLastName())
-				.email(user.getEmail())				
-				.phone(user.getPhoneNumber())
-				.locked(false)
+				.email(user.getEmail())
 				.active(false)
-				.role(Role.USER)
-				.password(SecurityUtil.passwordEncoder().encode(user.getPassword()))
+				.locked(false)
 				.createdAt(new Date())
+				.password(user.getPassword())
+				.phone(user.getPhoneNumber())
 				.build();
 		
-		log.info(builtUser.toString());
+		User savedUser = userService.save(newUser);
 		
-		userService.save(builtUser);
+		boolean isUnique = false;
 		
-		Cart cart = cartService.create(builtUser);
+		String token = null;
 		
-		log.info(cart.toString());
+		while (!isUnique) {
+			
+			token = Util.generateUniqueNumericUUId();
+			
+			if (!userConfirmService.findByToken(token).isPresent())
+				isUnique = true;
+			
+		}		
 		
-		return user;
+		
+		UserConfirmationToken userConfirmationToken = UserConfirmationToken.builder()
+				.token(token)
+				.user(savedUser)
+				.expiresAt(LocalDateTime.now().plusMonths(1))
+				.createdAt(LocalDateTime.now())
+				.build();
+		
+		userConfirmService.save(userConfirmationToken);
+		
+		return null;
 	}
 
 	@Override
-	@Transactional
 	public void confirmToken(String token) {
 		
-		UserConfirmationToken confirmToken = userConfirmationTokenService.findByToken(token)
-				.orElseThrow(() -> new NotFoundException("invalid_token: ".concat(token)));
+		UserConfirmationToken userConfirmationToken = userConfirmService.findByToken(token)
+				.orElseThrow(() -> new NotFoundException("invalid_token:".concat(token)));
 		
-		if ( !confirmToken.getExpiresAt().isBefore(LocalDateTime.now()) )
-			throw new ConflictException("invalid_token: ".concat(token));
-		
-		userService.enable(confirmToken.getUser().getEmail(), true);
-		
-		userConfirmationTokenService.confirmedAt(token, LocalDateTime.now());
-		
-		//TODO
+		if (userConfirmationToken.getExpiresAt().isAfter(LocalDateTime.now())){
+			
+			if (userConfirmationToken.getUser().getLastLogin() == null) {
+				
+				boolean isUnique = false;
+				
+				String newToken = null;
+				
+				while (!isUnique) {
+					
+					newToken = Util.generateUniqueNumericUUId();
+					
+					if (!userConfirmService.findByToken(newToken).isPresent())
+						isUnique = true;
+					
+				}
+
+				UserConfirmationToken newUserConfirmationToken = UserConfirmationToken.builder()
+						.token(newToken)
+						.user(userConfirmationToken.getUser())
+						.expiresAt(LocalDateTime.now().plusMonths(1))
+						.createdAt(LocalDateTime.now())
+						.build();
+				
+				userConfirmService.save(newUserConfirmationToken);
+				
+			}
+			
+		}
 		
 	}
-
+	
 }

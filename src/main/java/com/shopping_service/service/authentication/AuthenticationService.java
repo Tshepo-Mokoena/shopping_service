@@ -14,7 +14,7 @@ import com.shopping_service.client.exception.NotFoundException;
 import com.shopping_service.json.request.AuthRequest;
 import com.shopping_service.json.request.PasswordRequest;
 import com.shopping_service.persistence.loginhistory.LoginHistory;
-import com.shopping_service.persistence.tokens.passwordreset.PasswordResetToken;
+import com.shopping_service.persistence.token.passwordreset.PasswordResetToken;
 import com.shopping_service.persistence.user.User;
 import com.shopping_service.security.UserPrincipal;
 import com.shopping_service.security.jwt.IJwtProvider;

@@ -3,7 +3,7 @@ package com.shopping_service.service.token.passwordresettoken;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import com.shopping_service.persistence.tokens.passwordreset.PasswordResetToken;
+import com.shopping_service.persistence.token.passwordreset.PasswordResetToken;
 
 public interface IPasswordResetTokenService {
 	

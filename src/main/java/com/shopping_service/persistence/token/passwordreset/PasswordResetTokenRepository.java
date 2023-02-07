@@ -1,4 +1,4 @@
-package com.shopping_service.persistence.tokens.passwordreset;
+package com.shopping_service.persistence.token.passwordreset;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

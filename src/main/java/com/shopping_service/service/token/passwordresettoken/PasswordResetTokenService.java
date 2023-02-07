@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.shopping_service.persistence.tokens.passwordreset.PasswordResetToken;
-import com.shopping_service.persistence.tokens.passwordreset.PasswordResetTokenRepository;
+import com.shopping_service.persistence.token.passwordreset.PasswordResetToken;
+import com.shopping_service.persistence.token.passwordreset.PasswordResetTokenRepository;
 
 @Service
 public class PasswordResetTokenService implements IPasswordResetTokenService {

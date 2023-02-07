@@ -1,4 +1,4 @@
-package com.shopping_service.service.userconfirmationtoken;
+package com.shopping_service.service.token.userconfirmationtoken;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
