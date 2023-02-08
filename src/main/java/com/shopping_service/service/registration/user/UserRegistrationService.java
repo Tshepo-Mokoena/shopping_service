@@ -23,7 +23,7 @@ public class UserRegistrationService implements IUserRegistrationService {
 	private IUserService userService;
 	
 	@Autowired
-	private IUserConfirmationTokenService userConfirmService;
+	private IUserConfirmationTokenService userConfirmTokeService;
 
 	@Override
 	public CreateUser register(@Valid CreateUser user) {
@@ -40,20 +40,8 @@ public class UserRegistrationService implements IUserRegistrationService {
 				.build();
 		
 		User savedUser = userService.save(newUser);
-		
-		boolean isUnique = false;
-		
-		String token = null;
-		
-		while (!isUnique) {
-			
-			token = Util.generateUniqueNumericUUId();
-			
-			if (!userConfirmService.findByToken(token).isPresent())
-				isUnique = true;
-			
-		}		
-		
+				
+		String token = generateUserConfirmToken();		
 		
 		UserConfirmationToken userConfirmationToken = UserConfirmationToken.builder()
 				.token(token)
@@ -62,7 +50,7 @@ public class UserRegistrationService implements IUserRegistrationService {
 				.createdAt(LocalDateTime.now())
 				.build();
 		
-		userConfirmService.save(userConfirmationToken);
+		userConfirmTokeService.save(userConfirmationToken);
 		
 		return null;
 	}
@@ -70,25 +58,14 @@ public class UserRegistrationService implements IUserRegistrationService {
 	@Override
 	public void confirmToken(String token) {
 		
-		UserConfirmationToken userConfirmationToken = userConfirmService.findByToken(token)
+		UserConfirmationToken userConfirmationToken = userConfirmTokeService.findByToken(token)
 				.orElseThrow(() -> new NotFoundException("invalid_token:".concat(token)));
 		
 		if (userConfirmationToken.getExpiresAt().isAfter(LocalDateTime.now())){
 			
 			if (userConfirmationToken.getUser().getLastLogin() == null) {
-				
-				boolean isUnique = false;
-				
-				String newToken = null;
-				
-				while (!isUnique) {
-					
-					newToken = Util.generateUniqueNumericUUId();
-					
-					if (!userConfirmService.findByToken(newToken).isPresent())
-						isUnique = true;
-					
-				}
+								
+				String newToken = generateUserConfirmToken();
 
 				UserConfirmationToken newUserConfirmationToken = UserConfirmationToken.builder()
 						.token(newToken)
@@ -97,12 +74,30 @@ public class UserRegistrationService implements IUserRegistrationService {
 						.createdAt(LocalDateTime.now())
 						.build();
 				
-				userConfirmService.save(newUserConfirmationToken);
+				userConfirmTokeService.save(newUserConfirmationToken);
 				
 			}
 			
-		}
+		}		
 		
+	}
+	
+	private String generateUserConfirmToken() {
+		
+		String token = null;		
+		
+		boolean isUnique = false;		
+		
+		while (isUnique == false) {			
+			
+			token = Util.generateUniqueNumericUUId();			
+			
+			if (userConfirmTokeService.findByToken(token).isEmpty())
+				isUnique = true;
+			
+		}	
+		
+		return token;
 	}
 	
 }
