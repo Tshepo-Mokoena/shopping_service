@@ -24,7 +24,7 @@ public class UserPrincipal implements UserDetails {
 	
 	private String email;	
 	
-	private transient String password;
+	transient private String password;
 	
 	private Set<GrantedAuthority> authorities;
 	
@@ -32,7 +32,7 @@ public class UserPrincipal implements UserDetails {
 	
 	private boolean locked;
 	
-	private transient User user;
+	transient private User user;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -41,12 +41,12 @@ public class UserPrincipal implements UserDetails {
 
 	@Override
 	public String getPassword() {
-		return this.password = this.getUser().getPassword();
+		return this.password;
 	}
 
 	@Override
 	public String getUsername() {
-		return this.getUser().getEmail();
+		return this.email;
 	}
 
 	@Override
